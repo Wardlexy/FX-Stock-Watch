@@ -1,8 +1,15 @@
-# IDR Market Watch
+# FX Stock Watch
 
-Pantau kurs dan saham secara otomatis, lalu kirim alert ke HP lewat Pushover.
+Automated FX and Indonesian bank stock monitoring with Pushover alerts.
 
-## Yang Dipantau
+This project can run in two modes:
+
+- **Cloud mode, recommended:** Google Apps Script. Runs even when your laptop is off.
+- **Local mode, optional:** Windows PowerShell + Task Scheduler. Runs only when your PC is on and connected to the internet.
+
+## Monitored Assets
+
+FX pairs:
 
 - USD/IDR
 - SGD/IDR
@@ -10,46 +17,83 @@ Pantau kurs dan saham secara otomatis, lalu kirim alert ke HP lewat Pushover.
 - EUR/IDR
 - MYR/IDR
 - JPY/IDR
+
+Stocks:
+
 - BBCA.JK
 - BMRI.JK
 
-## Versi Lokal
+## Cloud Setup: Google Apps Script
 
-File:
-
-- `fx-pushover-alert.ps1`
-- `setup-fx-pushover-alert.ps1`
-
-Jalan lewat Windows Scheduled Task saat laptop/PC menyala dan ada internet.
-
-Contoh setup:
-
-```powershell
-.\setup-fx-pushover-alert.ps1 -PushoverToken "TOKEN_APP" -PushoverUser "USER_KEY"
-```
-
-Jadwal default:
-
-- 08:00 WIB
-- 12:00 WIB
-- 20:00 WIB
-
-## Versi Cloud
+Use this if you want the alerts to keep running without your laptop.
 
 File:
 
 - `google-apps-script-fx-pushover.gs`
 
-Jalan lewat Google Apps Script time-driven trigger, sehingga tetap jalan walau laptop mati.
+Setup:
 
-Langkah singkat:
+1. Open [Google Apps Script](https://script.google.com/).
+2. Create a new project.
+3. Open `Code.gs`.
+4. Replace the contents of `Code.gs` with the contents of `google-apps-script-fx-pushover.gs`.
+5. In `setPushoverSecrets()`, replace:
+   - `ISI_TOKEN_APP_PUSHOVER` with your Pushover app token.
+   - `ISI_USER_KEY_PUSHOVER` with your Pushover user key.
+6. Run `setPushoverSecrets()` once.
+7. Run `setupTriggers()` once.
+8. Run `checkMarketsAndNotify()` once to test the notification.
 
-1. Copy isi `google-apps-script-fx-pushover.gs` ke `Code.gs` di Google Apps Script.
-2. Isi token dan user key Pushover di `setPushoverSecrets()`.
-3. Run `setPushoverSecrets()` sekali.
-4. Run `setupTriggers()` sekali.
-5. Run `checkMarketsAndNotify()` untuk tes manual.
+Default cloud schedule:
 
-## Catatan
+- 08:00 Asia/Jakarta
+- 12:00 Asia/Jakarta
+- 20:00 Asia/Jakarta
 
-Project ini hanya mengirim alert naik, turun, atau stabil. Tidak ada auto-beli, auto-jual, atau transaksi otomatis. Keputusan beli, jual, dan tukar tetap manual.
+After the triggers are installed, Google runs the checks in the cloud. Your laptop does not need to be on.
+
+## Local Setup: Windows PowerShell
+
+Use this only if you also want a local Windows Scheduled Task.
+
+Files:
+
+- `fx-pushover-alert.ps1`
+- `setup-fx-pushover-alert.ps1`
+
+Setup:
+
+```powershell
+.\setup-fx-pushover-alert.ps1 -PushoverToken "PUSHOVER_APP_TOKEN" -PushoverUser "PUSHOVER_USER_KEY"
+```
+
+Default local schedule:
+
+- 08:00 local time
+- 12:00 local time
+- 20:00 local time
+
+This local version only runs while the Windows machine is on.
+
+## Alert Behavior
+
+Default thresholds:
+
+- FX pairs: `0.50%`
+- Stocks: `2.00%`
+
+The script stores the latest checked values and compares each new value with the previous saved value.
+
+By default, stable updates are stored but not sent as notifications. To receive notifications even when values are stable, set:
+
+```js
+sendStableNotifications: true,
+```
+
+in the Google Apps Script config.
+
+## Notes
+
+This project only sends monitoring alerts. It does not buy, sell, exchange, or execute any transaction automatically.
+
+Trading, investing, and currency exchange decisions remain manual.
