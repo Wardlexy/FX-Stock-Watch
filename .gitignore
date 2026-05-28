@@ -1,0 +1,6 @@
+fx-pushover-config.json
+fx-pushover-state.json
+*.log
+.env
+.env.*
+
