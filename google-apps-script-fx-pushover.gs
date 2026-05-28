@@ -48,6 +48,19 @@ function setupTriggers() {
   });
 }
 
+function testPushoverNotification() {
+  const props = PropertiesService.getScriptProperties();
+  const token = props.getProperty('PUSHOVER_APP_TOKEN');
+  const user = props.getProperty('PUSHOVER_USER_KEY');
+
+  if (!token || !user) {
+    throw new Error('Pushover token/user key belum tersimpan. Jalankan setPushoverSecrets() dulu.');
+  }
+
+  const timestamp = Utilities.formatDate(new Date(), 'Asia/Jakarta', 'yyyy-MM-dd HH:mm:ss');
+  sendPushover_(token, user, 'FX Stock Watch test', `Test notification OK.\nTime: ${timestamp} WIB`);
+}
+
 function checkMarketsAndNotify() {
   const props = PropertiesService.getScriptProperties();
   const token = props.getProperty('PUSHOVER_APP_TOKEN');
